@@ -79,7 +79,7 @@ func (ua *UIAutomator) GetWindowSize() (*WindowSize, error) {
 Get current app info
 */
 func (ua *UIAutomator) GetCurrentApp() (info *AppInfo, err error) {
-	output, err := ua.Shell([]string{"dumpsys", "window", "windows"}, 60)
+	output, err := ua.Shell([]string{"dumpsys", "window", "windows"}, 10)
 	if err != nil {
 		return
 	}

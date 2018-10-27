@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+	"time"
 )
 
 type (
@@ -123,4 +124,29 @@ func (ua *UIAutomator) GetSerialNumber() (string, error) {
 		nil,
 		transform,
 	)
+}
+
+/*
+Unblock the device
+*/
+func (ua *UIAutomator) Unlock() error {
+	var done = make(chan bool)
+
+	// This call will cause blocking, after 1s press home
+	go func() {
+		time.AfterFunc(
+			time.Duration(1000)*time.Millisecond,
+			func() {
+				done <- true
+			},
+		)
+		ua.Shell(
+			[]string{"am start -W -n com.github.uiautomator/.IdentifyActivity -e theme black"},
+			0,
+		)
+	}()
+
+	<-done
+
+	return ua.Press("home")
 }

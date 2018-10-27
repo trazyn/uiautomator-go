@@ -12,6 +12,8 @@ func main() {
 		Timeout:   10,
 	})
 
+	ua.Unlock()
+
 	// Show toast
 	toast := ua.NewToast()
 	toast.Show("Fuckiiiing", 10)

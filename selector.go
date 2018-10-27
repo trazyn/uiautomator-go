@@ -47,7 +47,7 @@ type (
 	}
 )
 
-var mask = map[string]int{
+var _MASK = map[string]int{
 	"text":                  0x01,       // MASK_TEXT,
 	"textContains":          0x02,       // MASK_TEXTCONTAINS,
 	"textMatches":           0x04,       // MASK_TEXTMATCHES,
@@ -468,7 +468,7 @@ func parseSelector(selector Selector) (Selector, error) {
 	res["childOrSiblingSelector"] = []interface{}{} // Unknow
 
 	for k, v := range selector {
-		if selectorMask, ok := mask[k]; ok {
+		if selectorMask, ok := _MASK[k]; ok {
 			res[k] = v
 			res["mask"] = res["mask"].(int) | selectorMask
 		} else {

@@ -5,14 +5,14 @@ import (
 )
 
 func main() {
-	client := ug.New(&ug.Config{
+	ua := ug.New(&ug.Config{
 		Host:      "10.10.20.78",
 		Port:      7912,
 		AutoRetry: 0,
 		Timeout:   10,
 	})
 
-	ele, err := client.GetElementBySelector(
+	ele, err := ua.GetElementBySelector(
 		map[string]interface{}{
 			"resourceId": "com.android.chrome:id/url_bar",
 		},

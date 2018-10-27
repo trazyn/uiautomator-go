@@ -27,9 +27,17 @@ import ug "github/trazyn/uiautomator-go"
 First, let yours mobile and PC join the same network.
 
 ```go
-client := ug.New("10.10.0.101:7912")
-info := client.GetDeviceInfo()
-fmt.Printf(info)
+ua := ug.New(&ug.Config{
+	Host:      "10.10.20.78",
+	Port:      7912,
+})
+
+ua.Unlock()
+
+// Show toast
+toast := ua.NewToast()
+toast.Show("hallo world", 10)
+
 
 ```
 

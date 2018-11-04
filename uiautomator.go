@@ -151,6 +151,10 @@ func (ua *UIAutomator) execute(request *http.Request, result interface{}, transf
 		}
 		defer response.Body.Close()
 
+		if response.StatusCode != http.StatusOK {
+			return boom(response)
+		}
+
 		// Bypass the body parser
 		if transform != nil {
 			switch fn := transform.(type) {
@@ -237,11 +241,6 @@ func (ua *UIAutomator) get(options *RPCOptions, result interface{}, transform in
 }
 
 func parse(response *http.Response) (payload interface{}, err error) {
-	if response.StatusCode != http.StatusOK {
-		err = boom(response)
-		return
-	}
-
 	var RPCReturned struct {
 		Error  *UiaError   `json:"error"`
 		Result interface{} `json:"result"`

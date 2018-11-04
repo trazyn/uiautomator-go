@@ -9,7 +9,7 @@ To install this library, simple:
 
 
 ```bash
-go get github/trazyn/uiautomator-go
+go get -u github.com/trazyn/uiautomator-go
 ```
 
 
@@ -18,7 +18,7 @@ Import the package:
 
 
 ```go
-import ug "github/trazyn/uiautomator-go"
+import ug "github.com/trazyn/uiautomator-go"
 ```
 
 

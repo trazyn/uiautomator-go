@@ -280,7 +280,7 @@ func (ele *Element) SwipeRight() error {
 /*
 Click on the screen
 */
-func (ele *Element) Click() error {
+func (ele *Element) Click(offset *Position) error {
 	if err := ele.WaitForExists(); err != nil {
 		return err
 	}
@@ -290,7 +290,7 @@ func (ele *Element) Click() error {
 		return err
 	}
 
-	return ele.ua.Click(abs)
+	return ele.ua.Click(abs, offset)
 }
 
 /*

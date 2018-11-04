@@ -83,6 +83,32 @@ func New(config *Config) *UIAutomator {
 	}
 }
 
+func (ua *UIAutomator) Ping() (status string, err error) {
+	transform := func(response *http.Response) error {
+		responseBody, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+
+		status = string(responseBody)
+		return nil
+	}
+
+	err = ua.get(
+		&RPCOptions{
+			URL: "/ping",
+		},
+		nil,
+		transform,
+	)
+
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (ua *UIAutomator) caniRetry(err error) bool {
 	shouldRetry := true &&
 		// Auto retry time should not 0

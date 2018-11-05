@@ -298,6 +298,83 @@ func (ele *Element) Click(offset *Position) error {
 }
 
 /*
+Screen scroll up
+*/
+func (ele *Element) ScrollUp(step int) error {
+	if err := ele.ua.post(
+		&RPCOptions{
+			Method: "scrollForward",
+			Params: []interface{}{ele.selector, true, step},
+		},
+		nil,
+		nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
+Screen scroll down
+*/
+func (ele *Element) ScrollDown(step int) error {
+	if err := ele.ua.post(
+		&RPCOptions{
+			Method: "scrollBackward",
+			Params: []interface{}{ele.selector, true, step},
+		},
+		nil,
+		nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
+Screen scroll to end
+*/
+func (ele *Element) ScrollToEnd() error {
+	if err := ele.ua.post(
+		&RPCOptions{
+			Method: "scrollToEnd",
+			Params: []interface{}{ele.selector, true, 500, 20},
+		},
+		nil,
+		nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
+Screen scroll to selector
+*/
+func (ele *Element) ScrollTo(selector Selector) error {
+	selector, err := parseSelector(selector)
+	if err != nil {
+		return err
+	}
+
+	if err := ele.ua.post(
+		&RPCOptions{
+			Method: "scrollTo",
+			Params: []interface{}{ele.selector, selector, true},
+		},
+		nil,
+		nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
 Long click on the element
 */
 func (ele *Element) LongClick() error {

@@ -114,7 +114,7 @@ func (ele Element) GetRect() (rect *ElementRect, err error) {
 /*
 Get Widget center point
 */
-func (ele Element) Center() (*Position, error) {
+func (ele Element) Center(offset *Position) (*Position, error) {
 	rect, err := ele.GetRect()
 	if err != nil {
 		return nil, err
@@ -123,9 +123,13 @@ func (ele Element) Center() (*Position, error) {
 	lx, ly, rx, ry := rect.Left, rect.Top, rect.Right, rect.Bottom
 	width, height := rx-lx, ry-ly
 
+	if offset == nil {
+		offset = &Position{0.5, 0.5}
+	}
+
 	abs := &Position{}
-	abs.X = float32(lx) + float32(width)*0.5
-	abs.Y = float32(ly) + float32(height)*0.5
+	abs.X = float32(lx) + float32(width)*offset.X
+	abs.Y = float32(ly) + float32(height)*offset.Y
 	return abs, nil
 }
 
@@ -285,12 +289,12 @@ func (ele *Element) Click(offset *Position) error {
 		return err
 	}
 
-	abs, err := ele.Center()
+	abs, err := ele.Center(offset)
 	if err != nil {
 		return err
 	}
 
-	return ele.ua.Click(abs, offset)
+	return ele.ua.Click(abs)
 }
 
 /*
@@ -301,7 +305,7 @@ func (ele *Element) LongClick() error {
 		return err
 	}
 
-	abs, err := ele.Center()
+	abs, err := ele.Center(nil)
 	if err != nil {
 		return err
 	}

@@ -50,18 +50,17 @@ func (ua *UIAutomator) rel2abs(rel *Position) *Position {
 /*
 Click on the screen
 */
-func (ua *UIAutomator) Click(position *Position, offset *Position) error {
+func (ua *UIAutomator) Click(position *Position) error {
 	if position.X < 0 || position.Y < 0 {
 		return fmt.Errorf("Click: an invalid position %q", position)
 	}
 
 	abs := ua.rel2abs(position)
-	offset = ua.rel2abs(offset)
 
 	return ua.post(
 		&RPCOptions{
 			Method: "click",
-			Params: []interface{}{abs.X + offset.X, abs.Y + offset.Y},
+			Params: []interface{}{abs.X, abs.Y},
 		},
 		nil,
 		nil,
@@ -71,7 +70,7 @@ func (ua *UIAutomator) Click(position *Position, offset *Position) error {
 /*
 Double click on the screen
 */
-func (ua *UIAutomator) DbClick(position *Position, offset *Position, duration float32) error {
+func (ua *UIAutomator) DbClick(position *Position, duration float32) error {
 	if position.X < 0 || position.Y < 0 {
 		return fmt.Errorf("DbClick: an invalid position %q", position)
 	}
@@ -79,14 +78,14 @@ func (ua *UIAutomator) DbClick(position *Position, offset *Position, duration fl
 	abs := ua.rel2abs(position)
 
 	// First click
-	if err := ua.Click(abs, offset); err != nil {
+	if err := ua.Click(abs); err != nil {
 		return err
 	}
 
 	time.Sleep(time.Duration(duration*1000) * time.Millisecond)
 
 	// Second click
-	if err := ua.Click(abs, offset); err != nil {
+	if err := ua.Click(abs); err != nil {
 		return err
 	}
 

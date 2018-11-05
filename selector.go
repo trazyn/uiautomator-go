@@ -215,8 +215,9 @@ func (ele Element) WaitForExists(duration float32, maxRetry int) error {
 		)
 
 		if err != nil || RPCReturned.Result == false {
-			if retry <= maxRetry {
-				retry++
+			retry++
+
+			if retry < maxRetry {
 				time.Sleep(time.Duration(duration*1000) * time.Millisecond)
 				continue
 			}

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type (
@@ -178,41 +179,69 @@ func (ele *Element) Eq(index int) (*Element, error) {
 /*
 Check if the specific UI object exists
 */
-func (ele Element) WaitForExists() error {
-	var RPCReturned struct {
-		Result bool `json:"result"`
-	}
-	transform := func(response *http.Response) error {
-		err := json.NewDecoder(response.Body).Decode(&RPCReturned)
-		if err != nil {
-			return err
-		}
-		return nil
+func (ele Element) WaitForExists(duration float32, maxRetry int) error {
+	var err error
+	var retry int
+
+	config := ele.ua.GetConfig()
+
+	if duration < 0 || duration > 60 {
+		duration = WAIT_FOR_EXISTS_DURATION
 	}
 
-	err := ele.ua.post(
-		&RPCOptions{
-			Method: "waitForExists",
-			Params: []interface{}{getParams(ele.selector), 20000},
-		},
-		nil,
-		transform,
-	)
-	if err != nil || RPCReturned.Result == false {
-		return &UiaError{
-			Code:    -32002,
-			Message: "Element not found",
-		}
+	if maxRetry < 0 || maxRetry > 10 {
+		maxRetry = WAIT_FOR_EXISTS_MAX_RETRY
 	}
 
-	return nil
+	for {
+		var RPCReturned struct {
+			Result bool `json:"result"`
+		}
+		transform := func(response *http.Response) error {
+			err := json.NewDecoder(response.Body).Decode(&RPCReturned)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
+		err = ele.ua.post(
+			&RPCOptions{
+				Method: "waitForExists",
+				Params: []interface{}{getParams(ele.selector), config.Timeout * 1000},
+			},
+			nil,
+			transform,
+		)
+
+		if err != nil || RPCReturned.Result == false {
+			if retry <= maxRetry {
+				retry++
+				time.Sleep(time.Duration(duration*1000) * time.Millisecond)
+				continue
+			}
+
+			err = &UiaError{
+				Code:    -32002,
+				Message: "Element not found",
+			}
+
+			break
+		}
+
+		// It's ok
+		break
+	}
+
+	return err
 }
 
 /*
 Swipe the element
 */
 func (ele Element) swipe(direction string) error {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return err
 	}
 	rect, err := ele.GetRect()
@@ -285,7 +314,8 @@ func (ele *Element) SwipeRight() error {
 Click on the screen
 */
 func (ele *Element) Click(offset *Position) error {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return err
 	}
 
@@ -378,7 +408,8 @@ func (ele *Element) ScrollTo(selector Selector) error {
 Long click on the element
 */
 func (ele *Element) LongClick() error {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return err
 	}
 
@@ -464,7 +495,8 @@ func (ele *Element) Sibling(selector Selector) (*Element, error) {
 Get widget text
 */
 func (ele Element) GetText() (string, error) {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return "", err
 	}
 
@@ -493,7 +525,8 @@ func (ele Element) GetText() (string, error) {
 Set widget text
 */
 func (ele Element) SetText(text string) error {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return err
 	}
 
@@ -511,7 +544,8 @@ func (ele Element) SetText(text string) error {
 Clear the widget text
 */
 func (ele Element) ClearText() error {
-	if err := ele.WaitForExists(); err != nil {
+	config := ele.ua.GetConfig()
+	if err := ele.WaitForExists(config.WaitForExistsDuration, config.WaitForExistsMaxRetry); err != nil {
 		return err
 	}
 

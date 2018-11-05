@@ -17,9 +17,11 @@ const (
 	VERSION  = "0.0.1"
 	BASE_URL = "/jsonrpc/0"
 
-	TIMEOUT        = 30 // Default timeout(second)
-	AUTO_RETRY     = 5  // Default retry times
-	RETRY_DURATION = 3  // Default retry duration
+	TIMEOUT                   = 30  // Default timeout(second)
+	AUTO_RETRY                = 5   // Default retry times
+	RETRY_DURATION            = 3   // Default retry duration
+	WAIT_FOR_EXISTS_MAX_RETRY = 3   // Default WaitForExistsMaxRetry
+	WAIT_FOR_EXISTS_DURATION  = 0.3 // Default WaitForExistsDuration
 )
 
 type (
@@ -36,11 +38,13 @@ type (
 	}
 
 	Config struct {
-		Host          string // Server host
-		Port          int    // Server port
-		Timeout       int    // Timeout(second)
-		AutoRetry     int    // Auto retry times, 0 is without retry
-		RetryDuration int    // Retry duration(second)
+		Host                  string  // Server host
+		Port                  int     // Server port
+		Timeout               int     // Timeout(second)
+		AutoRetry             int     // Auto retry times, 0 is without retry
+		RetryDuration         int     // Retry duration(second)
+		WaitForExistsDuration float32 // Unit second
+		WaitForExistsMaxRetry int     // Max retry times
 	}
 )
 
@@ -71,7 +75,11 @@ func New(config *Config) *UIAutomator {
 	}
 
 	if config.RetryDuration < 0 || config.RetryDuration > 60 {
-		config.RetryDuration = RETRY_DURATION
+		config.WaitForExistsDuration = WAIT_FOR_EXISTS_DURATION
+	}
+
+	if config.WaitForExistsMaxRetry < 0 || config.WaitForExistsMaxRetry > 10 {
+		config.WaitForExistsMaxRetry = WAIT_FOR_EXISTS_MAX_RETRY
 	}
 
 	return &UIAutomator{
@@ -81,6 +89,10 @@ func New(config *Config) *UIAutomator {
 		},
 		retryTimes: 0,
 	}
+}
+
+func (ua UIAutomator) GetConfig() *Config {
+	return ua.config
 }
 
 func (ua *UIAutomator) Ping() (status string, err error) {

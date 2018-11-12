@@ -258,25 +258,25 @@ func (ele Element) swipe(direction string) error {
 		return ele.ua.Swipe(
 			&Position{X: float32(cx), Y: float32(cy)},
 			&Position{X: float32(cx), Y: float32(ly)},
-			0.1,
+			20,
 		)
 	case "down":
 		return ele.ua.Swipe(
 			&Position{X: float32(cx), Y: float32(cy)},
 			&Position{X: float32(cx), Y: float32(ry - 1)},
-			0.1,
+			20,
 		)
 	case "left":
 		return ele.ua.Swipe(
 			&Position{X: float32(cx), Y: float32(cy)},
 			&Position{X: float32(lx), Y: float32(cy)},
-			0.1,
+			20,
 		)
 	case "right":
 		return ele.ua.Swipe(
 			&Position{X: float32(cx), Y: float32(cy)},
 			&Position{X: float32(rx - 1), Y: float32(cy)},
-			0.1,
+			20,
 		)
 	}
 

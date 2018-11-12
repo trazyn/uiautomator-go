@@ -145,7 +145,7 @@ func (ua *UIAutomator) LongClick(position *Position, duration float32) error {
 /*
 Swipe the screen
 */
-func (ua *UIAutomator) Swipe(from *Position, to *Position, duration float32) error {
+func (ua *UIAutomator) Swipe(from *Position, to *Position, step int) error {
 	if from.X < 0 || from.Y < 0 || to.X < 0 || to.Y < 0 {
 		return fmt.Errorf("Swipe: invalid from(%s) -> to(%s)", from, to)
 	}
@@ -156,7 +156,7 @@ func (ua *UIAutomator) Swipe(from *Position, to *Position, duration float32) err
 	return ua.post(
 		&RPCOptions{
 			Method: "swipe",
-			Params: []interface{}{from.X, from.Y, to.X, to.Y, duration * 200},
+			Params: []interface{}{from.X, from.Y, to.X, to.Y, step},
 		},
 		nil,
 		nil,

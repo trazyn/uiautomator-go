@@ -365,6 +365,24 @@ func (ele *Element) ScrollDown(step int) error {
 }
 
 /*
+Screen scroll to beginning
+*/
+func (ele *Element) ScrollToBeginning() error {
+	if err := ele.ua.post(
+		&RPCOptions{
+			Method: "flingBackward",
+			Params: []interface{}{ele.selector, true},
+		},
+		nil,
+		nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
 Screen scroll to end
 */
 func (ele *Element) ScrollToEnd() error {

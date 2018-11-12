@@ -164,6 +164,27 @@ func (ua *UIAutomator) Swipe(from *Position, to *Position, step int) error {
 }
 
 /*
+Swipe by points, unlock the gesture login
+*/
+func (ua *UIAutomator) SwipePoints(points ...*Position) error {
+	var positions []int
+
+	for _, v := range points {
+		abs := ua.rel2abs(v)
+		positions = append(positions, int(abs.X), int(abs.Y))
+	}
+
+	return ua.post(
+		&RPCOptions{
+			Method: "swipePoints",
+			Params: []interface{}{positions, 20},
+		},
+		nil,
+		nil,
+	)
+}
+
+/*
 Swipe the screen
 */
 func (ua *UIAutomator) Drag(start *Position, end *Position, duration float32) error {

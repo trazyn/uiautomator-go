@@ -6,7 +6,6 @@ package uiautomator
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -163,8 +162,27 @@ Get the instance via index
 */
 func (ele *Element) Eq(index int) *Element {
 	copied := ele
-	// Update the selector
-	copied.selector["instance"] = index
+
+	// Check is a child selector
+	childOrSiblingSelector := copied.selector["childOrSiblingSelector"].([]interface{})
+	lastSelectorIndex := len(childOrSiblingSelector)
+
+	if lastSelectorIndex > 0 {
+		// Get the child selector
+		lastSelector := childOrSiblingSelector[lastSelectorIndex-1].(Selector)
+
+		// Update the child selector
+		lastSelector["instance"] = index
+		newSelector := parseSelector(lastSelector)
+		childOrSiblingSelector[lastSelectorIndex-1] = newSelector
+	} else {
+		// Update the selector
+		copied.selector["instance"] = index
+
+		// Rebuild the selector
+		newSelector := parseSelector(copied.selector)
+		copied.selector = newSelector
+	}
 
 	return copied
 }
@@ -397,10 +415,7 @@ func (ele *Element) ScrollToEnd() error {
 Screen scroll to selector
 */
 func (ele *Element) ScrollTo(selector Selector) error {
-	selector, err := parseSelector(selector)
-	if err != nil {
-		return err
-	}
+	selector = parseSelector(selector)
 
 	if err := ele.ua.post(
 		&RPCOptions{
@@ -437,13 +452,28 @@ func (ele *Element) LongClick() error {
 Get the children or grandchildren
 */
 func (ele *Element) Child(selector Selector) (*Element, error) {
-	selector, err := parseSelector(selector)
-	if err != nil {
-		return nil, err
+	selector = parseSelector(selector)
+
+	var (
+		childOrSibling         = ele.selector["childOrSibling"]
+		childOrSiblingSelector = ele.selector["childOrSiblingSelector"]
+	)
+
+	if childOrSibling == nil {
+		childOrSibling = make([]interface{}, 1)
+		childOrSibling = append(childOrSibling.([]interface{}), "child")
 	}
 
-	ele.selector["childOrSibling"] = []interface{}{"child"}
-	ele.selector["childOrSiblingSelector"] = []interface{}{selector}
+	if childOrSiblingSelector == nil {
+		childOrSiblingSelector = make([]interface{}, 1)
+		childOrSiblingSelector = append(childOrSiblingSelector.([]interface{}), selector)
+	}
+
+	childOrSibling = append(childOrSibling.([]interface{}), "child")
+	childOrSiblingSelector = append(childOrSiblingSelector.([]interface{}), selector)
+
+	ele.selector["childOrSibling"] = childOrSibling
+	ele.selector["childOrSiblingSelector"] = childOrSiblingSelector
 
 	return ele, nil
 }
@@ -460,10 +490,7 @@ func (ele *Element) childByMethod(keywords string, method string, selector Selec
 		return nil
 	}
 
-	selector, err := parseSelector(selector)
-	if err != nil {
-		return nil, err
-	}
+	selector = parseSelector(selector)
 
 	if err := ele.ua.post(
 		&RPCOptions{
@@ -492,10 +519,7 @@ func (ele *Element) ChildByDescription(keywords string, selector Selector) (*Ele
 Get the sibling
 */
 func (ele *Element) Sibling(selector Selector) (*Element, error) {
-	selector, err := parseSelector(selector)
-	if err != nil {
-		return nil, err
-	}
+	selector = parseSelector(selector)
 
 	ele.selector["childOrSibling"] = []interface{}{"sibling"}
 	ele.selector["childOrSiblingSelector"] = []interface{}{selector}
@@ -577,33 +601,40 @@ Query the UI element by selector
 func (ua *UIAutomator) GetElementBySelector(selector Selector) (ele *Element, err error) {
 	ele = &Element{ua: ua}
 
-	selector, err = parseSelector(selector)
-	if err != nil {
-		return nil, err
-	}
+	selector = parseSelector(selector)
 
 	ele.selector = selector
 	return
 }
 
-func parseSelector(selector Selector) (Selector, error) {
-	res := make(Selector)
+func parseSelector(selector Selector) Selector {
+	res := selector
 
 	// Params initalization
-	res["mask"] = 0
-	res["childOrSibling"] = []interface{}{}         // Unknow
-	res["childOrSiblingSelector"] = []interface{}{} // Unknow
+	res["mask"] = selector["mask"]
+	res["childOrSibling"] = selector["childOrSibling"]
+	res["childOrSiblingSelector"] = selector["childOrSiblingSelector"]
+
+	if res["mask"] == nil {
+		res["mask"] = 0
+	}
+
+	if res["childOrSibling"] == nil {
+		res["childOrSibling"] = []interface{}{}
+	}
+
+	if res["childOrSiblingSelector"] == nil {
+		res["childOrSiblingSelector"] = []interface{}{}
+	}
 
 	for k, v := range selector {
 		if selectorMask, ok := _MASK[k]; ok {
 			res[k] = v
 			res["mask"] = res["mask"].(int) | selectorMask
-		} else {
-			return res, fmt.Errorf("Invalid selector: %v", selector)
 		}
 	}
 
-	return res, nil
+	return res
 }
 
 func getParams(selector Selector) interface{} {

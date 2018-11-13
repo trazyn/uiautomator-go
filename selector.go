@@ -158,10 +158,25 @@ func (ele Element) Count() (int, error) {
 }
 
 /*
+Clone the element
+*/
+func (ele Element) Clone() *Element {
+	copied := ele
+
+	copied.selector = make(Selector)
+
+	for k, v := range ele.selector {
+		copied.selector[k] = v
+	}
+
+	return &copied
+}
+
+/*
 Get the instance via index
 */
-func (ele *Element) Eq(index int) *Element {
-	copied := ele
+func (ele Element) Eq(index int) *Element {
+	copied := ele.Clone()
 
 	// Check is a child selector
 	childOrSiblingSelector := copied.selector["childOrSiblingSelector"].([]interface{})
@@ -451,12 +466,14 @@ func (ele *Element) LongClick() error {
 /*
 Get the children or grandchildren
 */
-func (ele *Element) Child(selector Selector) (*Element, error) {
+func (ele Element) Child(selector Selector) *Element {
+	copied := ele.Clone()
+
 	selector = parseSelector(selector)
 
 	var (
-		childOrSibling         = ele.selector["childOrSibling"]
-		childOrSiblingSelector = ele.selector["childOrSiblingSelector"]
+		childOrSibling         = copied.selector["childOrSibling"]
+		childOrSiblingSelector = copied.selector["childOrSiblingSelector"]
 	)
 
 	if childOrSibling == nil {
@@ -472,10 +489,9 @@ func (ele *Element) Child(selector Selector) (*Element, error) {
 	childOrSibling = append(childOrSibling.([]interface{}), "child")
 	childOrSiblingSelector = append(childOrSiblingSelector.([]interface{}), selector)
 
-	ele.selector["childOrSibling"] = childOrSibling
-	ele.selector["childOrSiblingSelector"] = childOrSiblingSelector
-
-	return ele, nil
+	copied.selector["childOrSibling"] = childOrSibling
+	copied.selector["childOrSiblingSelector"] = childOrSiblingSelector
+	return copied
 }
 
 func (ele *Element) childByMethod(keywords string, method string, selector Selector) (*Element, error) {

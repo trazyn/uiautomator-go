@@ -18,7 +18,6 @@ type (
 		ua       *UIAutomator
 		position *Position
 		selector Selector
-		original Selector
 	}
 
 	ElementRect struct {
@@ -162,18 +161,12 @@ func (ele Element) Count() (int, error) {
 /*
 Get the instance via index
 */
-func (ele *Element) Eq(index int) (*Element, error) {
+func (ele *Element) Eq(index int) *Element {
+	copied := ele
 	// Update the selector
-	ele.original["instance"] = index
+	copied.selector["instance"] = index
 
-	// Recompile the selector
-	recompile, err := parseSelector(ele.original)
-	if err != nil {
-		return nil, err
-	}
-
-	ele.selector = recompile
-	return ele, nil
+	return copied
 }
 
 /*
@@ -582,7 +575,7 @@ func (ele Element) ClearText() error {
 Query the UI element by selector
 */
 func (ua *UIAutomator) GetElementBySelector(selector Selector) (ele *Element, err error) {
-	ele = &Element{ua: ua, original: selector}
+	ele = &Element{ua: ua}
 
 	selector, err = parseSelector(selector)
 	if err != nil {

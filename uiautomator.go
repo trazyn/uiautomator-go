@@ -17,11 +17,13 @@ const (
 	VERSION  = "0.0.1"
 	BASE_URL = "/jsonrpc/0"
 
-	TIMEOUT                   = 30  // Default timeout(second)
-	AUTO_RETRY                = 5   // Default retry times
-	RETRY_DURATION            = 3   // Default retry duration
-	WAIT_FOR_EXISTS_MAX_RETRY = 3   // Default WaitForExistsMaxRetry
-	WAIT_FOR_EXISTS_DURATION  = 0.3 // Default WaitForExistsDuration
+	TIMEOUT                      = 30  // Default timeout(second)
+	AUTO_RETRY                   = 5   // Default retry times
+	RETRY_DURATION               = 3   // Default retry duration
+	WAIT_FOR_EXISTS_MAX_RETRY    = 3   // Default WaitForExistsMaxRetry
+	WAIT_FOR_EXISTS_DURATION     = 0.3 // Default WaitForExistsDuration
+	WAIT_FOR_DISAPPEAR_MAX_RETRY = 3   // Default WaitForDisappearMaxRetry
+	WAIT_FOR_DISAPPEAR_DURATION  = 0.3 // Default WaitForDisappearDuration
 )
 
 type (
@@ -39,13 +41,15 @@ type (
 	}
 
 	Config struct {
-		Host                  string  // Server host
-		Port                  int     // Server port
-		Timeout               int     // Timeout(second)
-		AutoRetry             int     // Auto retry times, 0 is without retry
-		RetryDuration         int     // Retry duration(second)
-		WaitForExistsDuration float32 // Unit second
-		WaitForExistsMaxRetry int     // Max retry times
+		Host                     string  // Server host
+		Port                     int     // Server port
+		Timeout                  int     // Timeout(second)
+		AutoRetry                int     // Auto retry times, 0 is without retry
+		RetryDuration            int     // Retry duration(second)
+		WaitForExistsDuration    float32 // Unit second
+		WaitForExistsMaxRetry    int     // Max retry times
+		WaitForDisappearDuration float32 // Unit second
+		WaitForDisappearMaxRetry int     // Max retry times
 	}
 )
 
@@ -76,11 +80,23 @@ func New(config *Config) *UIAutomator {
 	}
 
 	if config.RetryDuration < 0 || config.RetryDuration > 60 {
+		config.RetryDuration = RETRY_DURATION
+	}
+
+	if config.WaitForExistsDuration < 0 || config.WaitForExistsDuration > 60 {
 		config.WaitForExistsDuration = WAIT_FOR_EXISTS_DURATION
 	}
 
 	if config.WaitForExistsMaxRetry < 0 || config.WaitForExistsMaxRetry > 10 {
 		config.WaitForExistsMaxRetry = WAIT_FOR_EXISTS_MAX_RETRY
+	}
+
+	if config.WaitForDisappearDuration < 0 || config.WaitForDisappearDuration > 60 {
+		config.WaitForDisappearDuration = WAIT_FOR_DISAPPEAR_DURATION
+	}
+
+	if config.WaitForDisappearMaxRetry < 0 || config.WaitForDisappearMaxRetry > 10 {
+		config.WaitForDisappearMaxRetry = WAIT_FOR_DISAPPEAR_MAX_RETRY
 	}
 
 	return &UIAutomator{

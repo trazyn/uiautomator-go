@@ -222,11 +222,11 @@ Wait the specific UI object disappear
 */
 func (ele Element) WaitUntilGone(duration float32, maxRetry int) error {
 	if duration < 0 || duration > 60 {
-		duration = WAIT_FOR_EXISTS_DURATION
+		duration = WAIT_FOR_DISAPPEAR_DURATION
 	}
 
 	if maxRetry < 0 || maxRetry > 10 {
-		maxRetry = WAIT_FOR_EXISTS_MAX_RETRY
+		maxRetry = WAIT_FOR_DISAPPEAR_MAX_RETRY
 	}
 
 	return ele.wait(duration, maxRetry, false)

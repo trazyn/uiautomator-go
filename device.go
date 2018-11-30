@@ -85,12 +85,12 @@ func (ua *UIAutomator) GetCurrentApp() (info *AppInfo, err error) {
 	}
 
 	r := regexp.MustCompile(`mCurrentFocus=Window{.*\s+(?P<package>[^\s]+)/(?P<activity>[^\s]+)\}`)
-	matchd := r.FindStringSubmatch(output)
+	matched := r.FindStringSubmatch(output)
 	res := make(map[string]string)
 
 	for i, name := range r.SubexpNames() {
 		if i != 0 && len(name) > 0 {
-			res[name] = matchd[i]
+			res[name] = matched[i]
 		}
 	}
 

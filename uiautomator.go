@@ -35,6 +35,7 @@ type (
 		config     *Config
 		http       *http.Client
 		retryTimes int
+		size       *WindowSize
 	}
 
 	Config struct {

@@ -6,7 +6,6 @@ package uiautomator
 
 import (
 	"encoding/base64"
-	"fmt"
 	"net/http"
 )
 
@@ -131,11 +130,7 @@ func (ua *UIAutomator) GetScreenshot() (*Screenshot, error) {
 	result := &Screenshot{}
 	transform := func(data interface{}, response *http.Response) error {
 		// Convert to base64
-		result.Base64 = fmt.Sprintf(
-			"data:%s;base64,%s",
-			response.Header.Get("Content-Type"),
-			base64.StdEncoding.EncodeToString(data.([]byte)),
-		)
+		result.Base64 = base64.StdEncoding.EncodeToString(data.([]byte))
 		return nil
 	}
 

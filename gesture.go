@@ -33,7 +33,14 @@ func (ua *UIAutomator) rel2abs(rel *Position) *Position {
 	size := &WindowSize{}
 
 	if rel.X < 1 || rel.Y < 1 {
-		size, _ = ua.GetWindowSize()
+		if ua.size == nil {
+			size, _ = ua.GetWindowSize()
+
+			// Cache the window size
+			ua.size = size
+		}
+
+		size = ua.size
 	}
 
 	if rel.X < 1 {

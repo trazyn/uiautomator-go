@@ -206,17 +206,48 @@ func (ele Element) Eq(index int) *Element {
 Check if the specific UI object exists
 */
 func (ele Element) WaitForExists(duration float32, maxRetry int) error {
-	var err error
-	var retry int
-
-	config := ele.ua.GetConfig()
-
 	if duration < 0 || duration > 60 {
 		duration = WAIT_FOR_EXISTS_DURATION
 	}
 
 	if maxRetry < 0 || maxRetry > 10 {
 		maxRetry = WAIT_FOR_EXISTS_MAX_RETRY
+	}
+
+	return ele.wait(duration, maxRetry, true)
+}
+
+/*
+Wait the specific UI object disappear
+*/
+func (ele Element) WaitUntilGone(duration float32, maxRetry int) error {
+	if duration < 0 || duration > 60 {
+		duration = WAIT_FOR_EXISTS_DURATION
+	}
+
+	if maxRetry < 0 || maxRetry > 10 {
+		maxRetry = WAIT_FOR_EXISTS_MAX_RETRY
+	}
+
+	return ele.wait(duration, maxRetry, false)
+}
+
+/*
+Wait element exists or gone
+*/
+func (ele Element) wait(duration float32, maxRetry int, exists bool) error {
+	var (
+		err    error
+		retry  int
+		method string
+	)
+
+	config := ele.ua.GetConfig()
+
+	if exists {
+		method = "waitForExists"
+	} else {
+		method = "waitUntilGone"
 	}
 
 	for {
@@ -233,7 +264,7 @@ func (ele Element) WaitForExists(duration float32, maxRetry int) error {
 
 		err = ele.ua.post(
 			&RPCOptions{
-				Method: "waitForExists",
+				Method: method,
 				Params: []interface{}{getParams(ele.selector), config.Timeout * 1000},
 			},
 			nil,

@@ -231,6 +231,8 @@ func (ua *UIAutomator) post(options *RPCOptions, result interface{}, transform i
 		return err
 	}
 
+	fmt.Println(string(data))
+
 	request, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(data))
 	if err != nil {
 		return err

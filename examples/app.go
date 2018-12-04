@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"time"
 	ug "uiautomator"
 )
 
 func main() {
 	ua := ug.New(&ug.Config{
-		Host: "10.10.20.66",
-		Port: 7912,
+		Host:                  "10.10.60.11",
+		Port:                  7912,
+		Timeout:               10,
+		WaitForExistsMaxRetry: 3,
 	})
 
 	status, err := ua.Ping()
@@ -19,8 +20,10 @@ func main() {
 
 	fmt.Printf("status %v\n", status)
 
-	ua.Unlock()
-	ua.AppStart("com.android.chrome")
-	time.Sleep(time.Duration(1000) * time.Millisecond)
-	ua.AppStop("com.android.chrome")
+	res, err := ua.GetScreenshot()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf(res.Base64)
 }

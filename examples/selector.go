@@ -6,7 +6,7 @@ import (
 
 func main() {
 	ua := ug.New(&ug.Config{
-		Host:      "10.10.20.78",
+		Host:      "10.10.60.19",
 		Port:      7912,
 		AutoRetry: 0,
 		Timeout:   10,
@@ -79,7 +79,7 @@ func main() {
 	*/
 
 	// Clear the text input
-	err = ele.ClearText()
+	err = ele.WaitForExists(1, 3)
 	if err != nil {
 		panic(err)
 	}

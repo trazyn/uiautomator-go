@@ -79,7 +79,7 @@ func main() {
 	*/
 
 	// Clear the text input
-	err = ele.WaitForExists(1, 3)
+	err = ele.WaitUntilGone(1, 3)
 	if err != nil {
 		panic(err)
 	}

@@ -45,3 +45,4 @@ android/app/libs
 # Golang
 vendor/
 go.mod
+go.sum

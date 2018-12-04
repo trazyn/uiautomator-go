@@ -44,3 +44,4 @@ android/app/libs
 
 # Golang
 vendor/
+go.mod

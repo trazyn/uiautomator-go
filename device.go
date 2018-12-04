@@ -19,7 +19,7 @@ type (
 		DisplaySizeDpX     int    `json:"displaySizeDpX"`
 		DisplaySizeDpY     int    `json:"displaySizeDpY"`
 		ProductName        string `json:"productName"`
-		ScreenOn           bool   `json:"ccreenOn"`
+		ScreenOn           bool   `json:"screenOn"`
 		SdkInt             int    `json:"sdkInt"`
 		NaturalOrientation bool   `json:"naturalOrientation"`
 	}

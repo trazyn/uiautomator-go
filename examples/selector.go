@@ -1,8 +1,15 @@
 package main
 
 import (
+	"fmt"
 	ug "uiautomator"
 )
+
+func boom(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	ua := ug.New(&ug.Config{
@@ -17,9 +24,12 @@ func main() {
 			"resourceId": "com.android.chrome:id/url_bar",
 		},
 	)
-	if err != nil {
-		panic(err)
-	}
+	boom(err)
+
+	device, err := ua.GetDeviceInfo()
+	boom(err)
+
+	fmt.Println(device.ScreenOn)
 
 	/*
 		// Get child element

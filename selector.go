@@ -645,7 +645,7 @@ func (ele Element) ClearText() error {
 /*
 Query the UI element by selector
 */
-func (ua *UIAutomator) GetElementBySelector(selector Selector) (ele *Element, err error) {
+func (ua *UIAutomator) GetElementBySelector(selector Selector) (ele *Element) {
 	ele = &Element{ua: ua}
 
 	selector = parseSelector(selector)

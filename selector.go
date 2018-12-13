@@ -385,6 +385,10 @@ func (ele *Element) Click(offset *Position) error {
 		return err
 	}
 
+	return ele.ClickNoWait(offset)
+}
+
+func (ele *Element) ClickNoWait(offset *Position) error {
 	abs, err := ele.Center(offset)
 	if err != nil {
 		return err
@@ -591,6 +595,10 @@ func (ele Element) GetText() (string, error) {
 		return "", err
 	}
 
+	return ele.GetTextNoWait()
+}
+
+func (ele Element) GetTextNoWait() (string, error) {
 	var RPCReturned struct {
 		Result string `json:"result"`
 	}

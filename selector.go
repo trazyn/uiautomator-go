@@ -167,6 +167,14 @@ func (ele Element) Clone() *Element {
 
 	for k, v := range ele.selector {
 		copied.selector[k] = v
+
+		if k == "childOrSiblingSelector" {
+			nested := make([]interface{}, 0)
+			for _, selector := range v.([]interface{}) {
+				nested = append(nested, parseSelector(selector.(Selector)))
+			}
+			copied.selector[k] = nested
+		}
 	}
 
 	return &copied
@@ -655,7 +663,7 @@ func (ua *UIAutomator) GetElementBySelector(selector Selector) (ele *Element) {
 }
 
 func parseSelector(selector Selector) Selector {
-	res := selector
+	res := make(Selector)
 
 	// Params initalization
 	res["mask"] = selector["mask"]

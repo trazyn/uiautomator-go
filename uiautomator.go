@@ -253,7 +253,6 @@ func (ua *UIAutomator) post(options *RPCOptions, result interface{}, transform i
 		return err
 	}
 
-	fmt.Println(string(data))
 	return ua.execute(request, result, transform)
 }
 

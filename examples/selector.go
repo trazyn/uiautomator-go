@@ -5,12 +5,6 @@ import (
 	ug "uiautomator"
 )
 
-func boom(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
 	ua := ug.New(&ug.Config{
 		Host:      "10.10.60.19",
@@ -19,17 +13,35 @@ func main() {
 		Timeout:   10,
 	})
 
-	ele, err := ua.GetElementBySelector(
-		map[string]interface{}{
-			"resourceId": "com.android.chrome:id/url_bar",
-		},
-	)
-	boom(err)
+	eles := make([]*ug.Element, 0)
+	ele := ua.GetElementBySelector(map[string]interface{}{"className": "android.widget.ScrollView"})
+	fmt.Println(ele.Count())
 
-	device, err := ua.GetDeviceInfo()
-	boom(err)
+	ele = ele.Child(map[string]interface{}{"className": "android.view.ViewGroup"})
+	count, _ := ele.Count()
+	fmt.Println("count:", count)
 
-	fmt.Println(device.ScreenOn)
+	height := 139
+	for i := 0; i < count; i++ {
+		eleItem := ele.Eq(i)
+		rect, _ := eleItem.GetRect()
+		fmt.Println(rect)
+		if rect.Bottom-rect.Top == height {
+			eles = append(eles, eleItem)
+			fmt.Println(eleItem.GetRect())
+			// str := parseElement(eleItem)
+			// fmt.Println(str)
+			i += 4
+		}
+	}
+	fmt.Println("eles:", len(eles))
+	fmt.Println(eles)
+
+	fmt.Println("获取到的元素！！！！！")
+	for _, e := range eles {
+		rect, _ := e.GetRect()
+		fmt.Println("rect:", rect)
+	}
 
 	/*
 		// Get child element
@@ -87,10 +99,4 @@ func main() {
 			panic(err)
 		}
 	*/
-
-	// Clear the text input
-	err = ele.WaitUntilGone(1, 3)
-	if err != nil {
-		panic(err)
-	}
 }
